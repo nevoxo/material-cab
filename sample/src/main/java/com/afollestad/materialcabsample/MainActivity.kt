@@ -18,15 +18,16 @@ package com.afollestad.materialcabsample
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import com.afollestad.materialcab.attached.AttachedCab
 import com.afollestad.materialcab.attached.destroy
 import com.afollestad.materialcab.attached.isActive
 import com.afollestad.materialcab.createCab
+import com.afollestad.materialcabsample.databinding.ActivityMainBinding
 import com.afollestad.recyclical.datasource.emptySelectableDataSource
 import com.afollestad.recyclical.setup
 import com.afollestad.recyclical.viewholder.isSelected
 import com.afollestad.recyclical.withItem
-import kotlinx.android.synthetic.main.activity_main.list
 
 /** @author Aidan Follestad (afollestad) */
 class MainActivity : AppCompatActivity() {
@@ -35,17 +36,21 @@ class MainActivity : AppCompatActivity() {
   }
   private var mainCab: AttachedCab? = null
 
+  private lateinit var binding: ActivityMainBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
-    setSupportActionBar(findViewById(R.id.main_toolbar))
+
+    binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+    setSupportActionBar(binding.mainToolbar)
 
     dataSource.set(
         IntArray(100) { it + 1 }
             .map { MainItem("Item #$it") }
     )
 
-    list.setup {
+    binding.list.setup {
       withDataSource(dataSource)
       withItem<MainItem, MainViewHolder>(R.layout.listitem_main) {
         onBind(::MainViewHolder) { index, item ->

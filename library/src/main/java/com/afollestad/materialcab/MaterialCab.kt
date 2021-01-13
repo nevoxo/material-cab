@@ -40,7 +40,7 @@ fun Activity.createCab(
 ): AttachedCab {
   var replacedViewStub = true
 
-  val toolbar: Toolbar = if(attachToId != null) {
+  val toolbar: Toolbar = if (attachToId != null) {
     val attachToName = idName(attachToId)
 
     when (val attachToView = findViewById<View>(attachToId)) {
@@ -98,7 +98,6 @@ fun Fragment.createCab(
   )
   return context.createCab(attachToId, exec = exec)
 }
-
 
 /**
  * Calls [createCab] on the Fragment's Activity.

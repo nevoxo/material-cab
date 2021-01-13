@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
 apply from: '../dependencies.gradle'
 
 android {
@@ -19,6 +18,11 @@ android {
     targetSdkVersion versions.compileSdk
     versionCode versions.publishVersionCode
     versionName versions.publishVersion
+  }
+
+
+  buildFeatures {
+    dataBinding = true
   }
 }
 

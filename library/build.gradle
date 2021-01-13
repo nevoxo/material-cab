@@ -2,8 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply from: '../dependencies.gradle'
 
-apply from: '../bintrayconfig.gradle'
-
 android {
   compileSdkVersion versions.compileSdk
   buildToolsVersion versions.buildTools
