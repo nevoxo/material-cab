@@ -34,37 +34,46 @@ import com.afollestad.materialcab.internal.inflate
  * by ID [attachToId], inside the receiving [Activity].
  */
 fun Activity.createCab(
-  @IdRes attachToId: Int,
+  @IdRes attachToId: Int? = null,
+  view: View? = null,
   exec: CabApply
 ): AttachedCab {
-  val attachToName = idName(attachToId)
-  val attachToView = findViewById<View>(attachToId)
   var replacedViewStub = true
 
-  val toolbar: Toolbar = when (attachToView) {
-    is Toolbar -> {
-      // This is most likely a previous destroyed CAB that
-      // was inflated into a ViewStub.
-      attachToView
-    }
-    is ViewStub -> {
-      // We assign an ID so that we can find it again later
-      // when re-attaching, since destroying won't remove this,
-      // only hide it.
-      attachToView.inflatedId = attachToId
-      attachToView.layoutResource = R.layout.mcab_toolbar
-      attachToView.inflate() as Toolbar
-    }
-    is ViewGroup -> {
-      replacedViewStub = false
-      attachToView.inflate<Toolbar>(R.layout.mcab_toolbar)
+  val toolbar: Toolbar = if(attachToId != null) {
+    val attachToName = idName(attachToId)
+
+    when (val attachToView = findViewById<View>(attachToId)) {
+      is Toolbar -> {
+        // This is most likely a previous destroyed CAB that
+        // was inflated into a ViewStub.
+        attachToView
+      }
+      is ViewStub -> {
+        // We assign an ID so that we can find it again later
+        // when re-attaching, since destroying won't remove this,
+        // only hide it.
+        attachToView.inflatedId = attachToId
+        attachToView.layoutResource = R.layout.mcab_toolbar
+        attachToView.inflate() as Toolbar
+      }
+      is ViewGroup -> {
+        replacedViewStub = false
+        attachToView.inflate<Toolbar>(R.layout.mcab_toolbar)
           .also {
             attachToView.addView(it)
           }
-    }
-    else -> throw IllegalStateException(
+      }
+      else -> throw IllegalStateException(
         "Unable to attach to $attachToName, it's not a ViewStub or ViewGroup."
-    )
+      )
+    }
+  } else {
+    replacedViewStub = false
+    (view as ViewGroup).inflate<Toolbar>(R.layout.mcab_toolbar)
+      .also {
+        view.addView(it)
+      }
   }
 
   return RealAttachedCab(
@@ -85,7 +94,21 @@ fun Fragment.createCab(
   exec: CabApply
 ): AttachedCab {
   val context = activity ?: throw IllegalStateException(
-      "Fragment ${this::class.java.name} is not attached to an Activity."
+    "Fragment ${this::class.java.name} is not attached to an Activity."
   )
-  return context.createCab(attachToId, exec)
+  return context.createCab(attachToId, exec = exec)
+}
+
+
+/**
+ * Calls [createCab] on the Fragment's Activity.
+ */
+fun Fragment.createCab(
+  view: View,
+  exec: CabApply
+): AttachedCab {
+  val context = activity ?: throw IllegalStateException(
+    "Fragment ${this::class.java.name} is not attached to an Activity."
+  )
+  return context.createCab(view = view, exec = exec)
 }
